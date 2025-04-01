@@ -2,7 +2,7 @@
 
 # Proposal plan for project (first draft)
 
-__Authors:__ Victor Pekkari and Armon and Haghighi
+__Authors:__ Victor Pekkari and Armon Haghighi
 
 
 __`Terms:`__ we have total of `9 weeks` for this project. During these 9 weeks we have to `learn` about RMT, some application/applications to ML, `program` something related and then `present` everything we have done in a final report.
