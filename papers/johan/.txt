@@ -1,0 +1,16 @@
+For a solid grounding and practical perspective, consider these chapters from RMT4ML.pdf:
+
+• Chapter 1 – Introduction: This chapter sets the stage by discussing the pitfalls of high-dimensional 
+statistics and motivating why random matrix theory (RMT) is useful for modern machine learning.
+
+• Chapter 2 – Random Matrix Theory: It covers the fundamental objects and key results of RMT, including 
+spiked models and concentration phenomena, which will give you the theoretical background needed.
+
+• Chapter 4 – Kernel Methods: If you're interested in how RMT applies to kernel-based methods in ML, 
+this chapter dives into the behavior of random kernel matrices and their implications.
+
+• Chapter 5 – Large Neural Networks: This chapter explores RMT in the context of neural networks, 
+including analysis of gradient descent dynamics and recurrent networks, which is valuable if you plan to work with deep learning.
+
+Additionally, Chapter 8 on Universality and Real Data offers insights on how these theories apply to 
+practical datasets. These chapters together provide both the foundational theory and its applications to machine learning.
