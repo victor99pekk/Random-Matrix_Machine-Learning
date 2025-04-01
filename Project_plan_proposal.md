@@ -103,3 +103,56 @@ This is the `final` phase
 **Applications:**  
 ✔ Designing more robust optimization methods that avoid exploding or vanishing gradients.  
 ✔ Ensuring stable training in deep networks by controlling spectral properties.  
+
+
+### 7. Distributed Machine Learning & Communication-Efficient Training  
+- Large datasets require distributed learning, where models are trained across multiple machines with minimal communication overhead.  
+- RMT helps analyze performance loss due to splitting data across multiple machines.  
+- Weighted parameter averaging and iterative methods can be studied using high-dimensional statistics.  
+
+**Applications:**  
+✔ Optimizing distributed training strategies for large-scale machine learning models.  
+✔ Reducing communication costs in federated learning settings.  
+✔ Ensuring minimal performance loss when using distributed ordinary least squares (OLS) regression.  
+
+---
+
+### 8. Ridge Regression in High Dimensions  
+- Ridge regression is widely used for regularization in high-dimensional data settings.  
+- RMT helps analyze and optimize **one-shot distributed ridge regression** methods (e.g., the WONDER algorithm).  
+- Mean squared error (MSE) can be studied using random-effects models, providing new insights into bias-variance tradeoffs in distributed regression.  
+
+**Applications:**  
+✔ Improving efficiency of ridge regression for large-scale machine learning tasks.  
+✔ Designing new algorithms (like WONDER) that achieve high accuracy with reduced computation time.  
+✔ Applying distributed ridge regression to large-scale datasets (e.g., the Million Song Dataset).  
+
+
+### 7. Robustness in High-Dimensional Statistical Learning  
+- When data is **high-dimensional**, classical methods can fail due to overfitting or noise sensitivity.  
+- RMT provides theoretical **bounds on confidence intervals**, test errors, and robustness metrics.  
+
+**Applications:**  
+✔ Developing more **robust** machine learning models in **noisy or adversarial** environments.  
+✔ Enhancing **outlier detection** in high-dimensional datasets.  
+✔ Improving **feature selection** when dealing with correlated features.  
+
+### 8. High-Dimensional Covariance Estimation & Inference  
+- Many ML models rely on estimating covariance matrices, but **standard estimators fail** in high dimensions.  
+- RMT provides **better-conditioned covariance estimators**, reducing instability in inverse calculations.  
+
+**Applications:**  
+✔ Enhancing **Gaussian Process regression** and kernel-based methods.  
+✔ Improving **portfolio optimization** in financial ML by using **better-conditioned covariance matrices**.  
+✔ Designing **better uncertainty quantification techniques** in probabilistic machine learning.  
+
+---
+
+### 9. Eigenvalue-Based Anomaly Detection  
+- The eigenvalue spectrum of large datasets can reveal hidden **anomalous patterns** (e.g., fraud detection, cybersecurity threats).  
+- RMT helps distinguish **true signals from random noise** in high-dimensional settings.  
+
+**Applications:**  
+✔ Developing **unsupervised anomaly detection** techniques based on spectral methods.  
+✔ Improving **fraud detection in finance** using spectral signatures of transaction data.  
+✔ Enhancing **cybersecurity** by detecting unusual activity in high-dimensional logs.  
