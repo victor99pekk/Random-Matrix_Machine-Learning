@@ -1,6 +1,10 @@
 
 
 # Proposal plan for project (first draft)
+
+__Authors:__ Victor Pekkari and Armon and Haghighi
+
+
 __`Terms:`__ we have total of `9 weeks` for this project. During these 9 weeks we have to `learn` about RMT, some application/applications to ML, `program` something related and then `present` everything we have done in a final report.
 
 We should just keep going if we feel like we are done with a phase before the set deadline. There is no need to wait for the next phase to begin.
