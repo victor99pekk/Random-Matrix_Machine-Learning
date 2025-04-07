@@ -1,0 +1,16 @@
+PAGE 10-11
+when estimating the covariance matrix, classical statistics will often assume that as the number of samples (n -> inf), 
+the sample covariance matrix will converge to the true covariance matrix (and the eignevalues will therefore concentrate 
+around 1, assuming the true covariance matrix is the identity matrix). But when the number of features p is large compared 
+to the number of samples n (100p > n) this classical intution breaks down
+
+high dimensionality basically makes the eigenvalues of the covariance matrix variy more. equation 1.2 shows a theoretical 
+bound for how much these eiegnevalues can variy. they bring up that estimating the covariance matrix of MNIST can be dangerous too, 
+since it contains about 6000 images per number each with 784 pixels
+
+the marcenko-pastur law holds as long as the applies as long as the matrix have indendent normalize entrie, and the entries 
+have mean 0 and unit variance.
+
+
+PAGE 20-21
+spiked models are a central concept in rmt especially relevant for understanding signal vs noise in high dimensionla data
