@@ -4,6 +4,20 @@ I have found some applications, and an LLM has found some. All "sources"/"places
 
 `It is possible to read about most of the applications listed below in either RMT4ML.pdf or HDP.pdf`
 
+
+### Analyze the weight matrices:
+
+__Spectral analysis:__ (eigenvlues: structure and stability of network) (outlier weights: important features learned)
+
+
+__Generalization and Overfitting:__ (effective rank: how important are learnt features) (noise vs signal?)
+
+
+__Training dynamics:__ observe shifts in eigenvalues during training to see how the neural network evolves
+
+---
+
+
 ### 1. Understanding the Neural Network Training and Generalization  
 - The Hessian (second derivative of the loss function) captures the curvature of the loss landscape, and its eigenvalues provide insights into optimization and generalization.  
 - RMT helps analyze the spectral density of Hessians, showing that neural network loss landscapes often have a bulk of near‐zero eigenvalues with some outliers, which affects convergence behavior.  
