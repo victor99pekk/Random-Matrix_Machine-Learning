@@ -60,6 +60,8 @@
 ✔ Designing more robust optimization methods that avoid exploding or vanishing gradients.  
 ✔ Ensuring stable training in deep networks by controlling spectral properties.  
 
+---
+
 
 ### 7. Distributed Machine Learning & Communication-Efficient Training  
 - Large datasets require distributed learning, where models are trained across multiple machines with minimal communication overhead.  
@@ -83,6 +85,8 @@
 ✔ Designing new algorithms (like WONDER) that achieve high accuracy with reduced computation time.  
 ✔ Applying distributed ridge regression to large-scale datasets (e.g., the Million Song Dataset).  
 
+---
+
 
 ### 7. Robustness in High-Dimensional Statistical Learning  
 - When data is **high-dimensional**, classical methods can fail due to overfitting or noise sensitivity.  
@@ -92,6 +96,9 @@
 ✔ Developing more **robust** machine learning models in **noisy or adversarial** environments.  
 ✔ Enhancing **outlier detection** in high-dimensional datasets.  
 ✔ Improving **feature selection** when dealing with correlated features.  
+
+---
+
 
 ### 8. High-Dimensional Covariance Estimation & Inference  
 - Many ML models rely on estimating covariance matrices, but **standard estimators fail** in high dimensions.  
@@ -113,14 +120,20 @@
 ✔ Improving **fraud detection in finance** using spectral signatures of transaction data.  
 ✔ Enhancing **cybersecurity** by detecting unusual activity in high-dimensional logs.  
 
+---
 
 ### 10. echo state neural nets
 - Chapter 5.3 in RMT4ML
+- 
+---
 
 ### 11. Large-Dimensional Convex Optimization
 - Chapter 6.1 in RMT4ML
 - when the solution to the loss function doesn't have a closed form. RMT can be used to study it
 - large dimensional SVMs
+
+---
+
 
 ### 12. applicaitions of random matrices from HDP
 Three applications of random matrix theory are discussed in this chapter: a spectral clustering algorithm for recovering clusters, or communities, in com- plex networks (Section 4.5), covariance estimation (Section 4.7) and a spectral clustering algorithm for data presented as geometric point sets (Section 4.7.1).
