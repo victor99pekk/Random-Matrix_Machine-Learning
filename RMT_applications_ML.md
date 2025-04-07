@@ -1,5 +1,5 @@
 # Possible Applications in ML  
-Applications have been "found" by me and an LLM. All "sources" or places to find out more were found by the search function in chatgpt
+I have found some applications, and an LLM has found some. All "sources"/"places to find out more" were found by the search function in chatgpt though, so take them with a grain of salt, as a possible place to find out more.
 
 ### 1. Understanding the Neural Network Training and Generalization  
 - The Hessian (second derivative of the loss function) captures the curvature of the loss landscape, and its eigenvalues provide insights into optimization and generalization.  
