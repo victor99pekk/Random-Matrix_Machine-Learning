@@ -1,5 +1,8 @@
 # Possible Applications in ML  
-I have found some applications, and an LLM has found some. All "sources"/"places to find out more" were found by the search function in chatgpt though, so take them with a grain of salt, as a possible place to find out more.
+I have found some applications, and an LLM has found some. All "sources"/"places to find out more" were found by the search function in chatgpt though, so take them with a grain of salt, as a possible place to find out more. 
+
+
+`It is possible to read about most of the applications listed below in either RMT4ML.pdf or HDP.pdf`
 
 ### 1. Understanding the Neural Network Training and Generalization  
 - The Hessian (second derivative of the loss function) captures the curvature of the loss landscape, and its eigenvalues provide insights into optimization and generalization.  
