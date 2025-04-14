@@ -1,7 +1,6 @@
 NOTES FROM MEETINGS
 
 
-
 MEETING 1:
 
 Chapter 1,2, 3, 4 extra important!, (kinchine not improtnat)
@@ -11,4 +10,13 @@ then cool stuff happens at chapter 5... and forward. but the initial chapters ar
 how far can we get into chapter 2 for next week?
 
 -------------------------------------------------------
+
+MEETING 2:
+
+notes: 
+markovs inequality; if we have expectwed value for X withy t, we hae the same for X^2 with t^2. we get function s with the  
+
+TODO:
+-go through all proofs chapter 2, understand all
+
 
