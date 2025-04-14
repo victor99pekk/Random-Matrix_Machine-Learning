@@ -1,0 +1,9 @@
+RANDOM NOTES - THINGS TO REMEMBER
+
+
+what are concentration inequalities good for?
+DEFINITION: how likely it is to see something that is far from the mean
+- machine learning: proving generalization bounds, meaning how well our model is goin to perform on unseen data
+                    understanding the overfitting risk
+- algorithms:       analysing randomized graphs
+                    bounding runtimes in randomized graphs
