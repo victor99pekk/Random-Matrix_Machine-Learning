@@ -7,3 +7,7 @@ DEFINITION: how likely it is to see something that is far from the mean
                     understanding the overfitting risk
 - algorithms:       analysing randomized graphs
                     bounding runtimes in randomized graphs
+
+
+DONT UNDERSTAND:
+berry-Essen theorem
