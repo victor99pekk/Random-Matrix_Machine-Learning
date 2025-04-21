@@ -19,4 +19,22 @@ markovs inequality; if we have expectwed value for X withy t, we hae the same fo
 TODO:
 -go through all proofs chapter 2, understand all
 
+-------------------------------------------------------
+
+
+MEETING 3:
+
+QUESTIONS:
+hoeffdings:
+1. assumption of the 2-norm of a in hoeffding proof being 1?
+2. assume bound is {-1, 1} for the bernoulli random variable? 
+do we loose any generality when we assume the bounds like this?
+3. are the a:s in the hoeffdings inequality a problem?
+
+chernoffs:
+3. how did we loose the a:s that we had in the corresponding function
+in hoeffdings. equation (2.7)
+4. why would you want to use hoeffdings instead of chernoff
+5. is chernoff better because of the factor (1/t) in the denominator?
+6. what does it mean to assume a MGF?
 
