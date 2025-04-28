@@ -1,5 +1,7 @@
 NOTES FROM MEETINGS
 
+link: https://ucsd.zoom.us/my/rayansaab 
+
 
 MEETING 1:
 
@@ -26,7 +28,8 @@ MEETING 3:
 
 QUESTIONS:
 hoeffdings:
-1. assumption of the 2-norm of a in hoeffding proof being 1?
+1. assumption of the 2-norm of a in hoeffding proof being 1? is it since we can multiply the LHS & RHS
+with a scalar?
 2. assume bound is {-1, 1} for the bernoulli random variable? 
 do we loose any generality when we assume the bounds like this?
 3. are the a:s in the hoeffdings inequality a problem?
@@ -38,3 +41,17 @@ in hoeffdings. equation (2.7)
 5. is chernoff better because of the factor (1/t) in the denominator?
 6. what does it mean to assume a MGF?
 
+graph application:
+d ≥ C * log(n) ?
+
+-------------------------------------------------------
+
+
+
+MEETING 4:
+
+QUESTIONS:
+1. when are the coordinates in a random isotropic vector independent? is it when the length of
+the vector i random?
+
+2. why does he show 2 proofs of grothendieck? especially when one is considerably worse?
