@@ -53,5 +53,8 @@ MEETING 4:
 QUESTIONS:
 1. when are the coordinates in a random isotropic vector independent? is it when the length of
 the vector i random?
-
 2. why does he show 2 proofs of grothendieck? especially when one is considerably worse?
+
+PLAN NEXT WEEK:
+- look at maximum cut; use cases, complexity...
+- start next chapter
