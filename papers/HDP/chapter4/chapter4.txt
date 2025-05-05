@@ -1,0 +1,42 @@
+Chapter 4 – Random matrices
+
+At its core, Chapter 4 is about understanding the spectral (eigenvalue/singular-value) behavior of random matrices in finite dimensions, 
+and then using those non-asymptotic bounds to drive algorithms and error guarantees in high-dimensional settings.
+
+4.1 Preliminaries on matrices
+  • Definitions: operator (spectral) norm, Frobenius norm, trace, eigenvalues, singular values  
+  • Basic tools: matrix algebra facts, relationships between norms, Weyl’s inequalities
+
+4.2 Nets, covering numbers and packing numbers
+  • ε-nets in metric spaces: existence and size via volume comparisons  
+  • Covering numbers N(T, ‖·‖, ε) and packing numbers M(T, ‖·‖, ε)  
+  • Relation: N ≤ M ≤ N(…)·N(…) (duality), key lemmas for discretizing infinite sets
+
+4.3 Application: error correcting codes
+  • Hamming space as a high-dimensional metric space  
+  • Existence of codes via packing bounds (Gilbert–Varshamov; sphere-packing)  
+  • Rate-distance trade-off obtained by covering/packing arguments
+
+4.4 Upper bounds on random sub-gaussian matrices
+  • Model: A ∈ ℝ^{n×N} with independent, mean-zero, sub-gaussian entries (or rows)  
+  • Concentration of ‖Ax‖₂ around its mean for fixed x (via nets + union bound)  
+  • Operator‐norm bound: ‖A‖_{op} ≲ √n + √N (with high probability)
+
+4.5 Application: community detection in networks
+  • Adjacency matrix of a random graph as noisy low‐rank structure + noise  
+  • Spectral clustering: top eigenvectors recover partition under stochastic block model  
+  • Error bounds follow from matrix concentration (Section 4.4)
+
+4.6 Two-sided bounds on sub-gaussian matrices
+  • Lower and upper singular‐value bounds (restricted isometry for tall/wide A)  
+  • Delocalization: all singular values lie in [√n − C√N, √n + C√N] w.h.p.  
+  • Implications for invertibility and conditioning of random matrices
+
+4.7 Application: covariance estimation and clustering
+  • Sample covariance matrix Σ̂ = (1/N)X Xᵀ for i.i.d. sub-gaussian samples X  
+  • Deviation bounds ‖Σ̂ − Σ‖_{op} ≲ √(n/N) + (n/N) w.h.p.  
+  • Consequences for principal‐component analysis and cluster separation
+
+4.8 Notes
+  • Historical references for random‐matrix theory (e.g. Wigner, Marchenko–Pastur)  
+  • Further reading on non-asymptotic bounds, combinatorial constructions, and applications  
