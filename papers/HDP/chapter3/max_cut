@@ -1,0 +1,12 @@
+
+
+MAX CUT - Applications
+
+1. ML and clustering
+- Max-Cut can be utilized for partitioning data into two distinct clusters by maximizing the dissimilarity between them. This approach is particularly useful when the data is represented as a graph, with nodes as data points and edge weights indicating similarity or distance. Treating its nodes as features and its edges as distances, the max cut algorithm divides a graph in two well-separated subsets. In other words, it can be naturally applied to perform binary classification.
+- recently research has been made reagrding using deep learning as a way to approximate max cut
+
+
+2. VLSI Circuit Design
+
+3. Network Design and Optimization
