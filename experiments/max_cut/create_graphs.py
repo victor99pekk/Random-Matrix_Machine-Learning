@@ -2,8 +2,8 @@ import numpy as np
 import random
 
 # Parameters for dataset generation
-n = 10            # number of nodes in each graph
-num_samples = 10**2 # number of training samples to generate
+n = 30            # number of nodes in each graph
+num_samples = 30 # number of training samples to generate
 output_file = "maxcut_dataset.csv"
 
 def generate_maxcut_instance(n: int):
