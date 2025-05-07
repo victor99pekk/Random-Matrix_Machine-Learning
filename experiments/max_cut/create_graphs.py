@@ -1,147 +1,100 @@
 import random
 import torch
-
-def write_dataset(filename, Q_rows, target_seq):
-    """
-    Write the dataset to a text file.
-
-    Format:
-    - First line: num_samples n
-    - Then for each sample:
-        - n lines: each row of Q_rows (n floats space-separated)
-        - 1 line: target sequence (n+1 ints space-separated)
-    """
-    num_samples, n, _ = Q_rows.shape
-    with open(filename, 'w') as f:
-        f.write(f"{num_samples} {n}\n")
-        for i in range(num_samples):
-            # Write Q matrix rows
-            for row in Q_rows[i]:
-                f.write(' '.join(map(str, row.tolist())) + '\n')
-            # Write target sequence
-            f.write(' '.join(map(str, target_seq[i].tolist())) + '\n')
-
-def read_dataset(filename):
-    """
-    Read the dataset from a text file written by write_dataset.
-
-    Returns:
-        Q_rows: torch.FloatTensor of shape [num_samples, n, n]
-        target_seq: torch.LongTensor of shape [num_samples, n+1]
-    """
-    with open(filename, 'r') as f:
-        first = f.readline().strip().split()
-        num_samples, n = map(int, first)
-
-        Q_rows = torch.zeros(num_samples, n, n, dtype=torch.float)
-        target_seq = torch.zeros(num_samples, n+1, dtype=torch.long)
-
-        for i in range(num_samples):
-            # Read Q matrix
-            for j in range(n):
-                row_vals = list(map(float, f.readline().strip().split()))
-                Q_rows[i, j] = torch.tensor(row_vals)
-            # Read target sequence
-            seq_vals = list(map(int, f.readline().strip().split()))
-            target_seq[i] = torch.tensor(seq_vals)
-
-    return Q_rows, target_seq
+import pathlib
+from typing import Tuple
 
 
-def write_ground_truth(filename, Q_rows, is_A_list):
-    """
-    Write the ground truth adjacency matrices to a text file.
+class MaxCutDatasetBuilder:
+    """Generate pointer-network training files exactly like Gu & Yang (2020)."""
 
-    Format:
-    - First line: num_samples n
-    - Then for each sample:
-        - n lines: each row of the ground truth adjacency matrix (n floats space-separated)
-    """
-    num_samples, n, _ = Q_rows.shape
-    with open(filename, 'w') as f:
-        f.write(f"{num_samples} {n}\n")
-        for i in range(num_samples):
-            is_A = is_A_list[i]
-            ground_truth_Q = torch.zeros(n, n, dtype=torch.float)
-            for u in range(n):
-                for v in range(n):
-                    if u != v and ((is_A[u] and is_A[v]) or (~is_A[u] and ~is_A[v])):
-                        ground_truth_Q[u, v] = 1.0
-            for row in ground_truth_Q:
-                f.write(' '.join(map(str, row.tolist())) + '\n')
+    def __init__(self, n: int, eos_index: int = 0):
+        self.n = n
+        self.eos_index = eos_index  # 0 ← EOS, 1..n ← vertices
+        assert eos_index == 0, "Article format requires EOS = 0 and 1-based vertices"
+
+    # --------------------------------------------------------------------- #
+    # 1.  Simple SBM graph sampler (unchanged)                              #
+    # --------------------------------------------------------------------- #
+    def _sample_sbm(self, x_a: float, p_inter: float, y_b: float,
+                    size_A_mu: float, size_A_sigma: float) -> Tuple[torch.Tensor, torch.BoolTensor]:
+        is_A = torch.zeros(self.n, dtype=torch.bool)
+        size_A = int(max(1, min(self.n - 1, random.gauss(size_A_mu, size_A_sigma))))
+        is_A[torch.randperm(self.n)[:size_A]] = True
+
+        Q = torch.zeros(self.n, self.n)
+        for u in range(self.n):
+            for v in range(u + 1, self.n):
+                p = x_a if (is_A[u] and is_A[v]) else y_b if (~is_A[u] and ~is_A[v]) else p_inter
+                if random.random() < p:
+                    Q[u, v] = Q[v, u] = 1.0
+        return Q, is_A
+
+    # --------------------------------------------------------------------- #
+    # 2.  Build a whole dataset                                             #
+    # --------------------------------------------------------------------- #
+    def build_dataset(self, num_samples: int,
+                      x_a: float = 0.8, p_inter: float = 0.2, y_b: float = 0.75,
+                      size_A_mu: float = 25, size_A_sigma: float = 3):
+        Qs, seqs, masks = [], [], []
+        for _ in range(num_samples):
+            Q, is_A = self._sample_sbm(x_a, p_inter, y_b, size_A_mu, size_A_sigma)
+            Qs.append(Q)
+            seqs.append(self._membership_to_sequence(is_A))
+            masks.append(is_A)
+        self.Q_rows = torch.stack(Qs)  # [B, n, n]
+        self.targets = torch.stack(seqs)  # [B, n+1]
+        self.masks = masks
+
+    # --------------------------------------------------------------------- #
+    # 3.  Write / read in article format                                    #
+    # --------------------------------------------------------------------- #
+    def write_dataset(self, path: str):
+        path = pathlib.Path(path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with path.open('w') as f:
+            f.write(f"{len(self.Q_rows)} {self.n}\n")
+            for Q, seq in zip(self.Q_rows, self.targets):
+                for row in Q:
+                    f.write(' '.join(map(str, row.tolist())) + '\n')
+                f.write(' '.join(map(str, seq.tolist())) + '\n')
+
+    @staticmethod
+    def read_dataset(path: str):
+        with open(path) as f:
+            m, n = map(int, f.readline().split())
+            Q = torch.zeros(m, n, n)
+            tgt = torch.zeros(m, n + 1, dtype=torch.long)
+            for i in range(m):
+                for r in range(n):
+                    Q[i, r] = torch.tensor(list(map(float, f.readline().split())))
+                tgt[i] = torch.tensor(list(map(int, f.readline().split())))
+        return Q, tgt
+
+    def write_ground_truth_matrix(self, path: str):
+        path = pathlib.Path(path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with path.open('w') as f:
+            f.write(f"{len(self.Q_rows)} {self.n}\n")
+            for mask in self.masks:
+                M = ((mask & mask[:, None]) | (~mask & ~mask[:, None])).float()
+                torch.diagonal(M).fill_(0.0)
+                for row in M:
+                    f.write(' '.join(map(str, row.tolist())) + '\n')
+
+    # --------------------------------------------------------------------- #
+    # 4.  Helper: build <A vertices> + EOS + padding                        #
+    # --------------------------------------------------------------------- #
+    def _membership_to_sequence(self, is_A: torch.BoolTensor) -> torch.LongTensor:
+        A = torch.nonzero(is_A, as_tuple=True)[0] + 1  # 1-based vertex IDs
+        seq = torch.full((self.n + 1,), self.eos_index, dtype=torch.long)
+        seq[:len(A)] = A  # vertices in set A
+        seq[len(A)] = self.eos_index  # single EOS
+        # rest remain EOS (0)
+        return seq
 
 
-# Modify generate_sbm_dataset to return is_A_list
-def generate_sbm_dataset(num_samples: int,
-                         n: int,
-                         x_a: float,
-                         p_inter: float,
-                         y_b: float) -> tuple[torch.FloatTensor, torch.LongTensor, list]:
-    """
-    Generate a dataset of stochastic block model graphs and ordered cut sequences.
-
-    Returns:
-        Q_rows_tensor: FloatTensor [num_samples, n, n], adjacency matrices.
-        target_seq_tensor: LongTensor [num_samples, n+1], ordered node indices with EOS.
-        is_A_list: List of boolean tensors indicating group membership for each graph.
-    """
-    EOS_index = n
-    Q_rows_tensor = torch.zeros(num_samples, n, n, dtype=torch.float)
-    target_seq_tensor = torch.zeros(num_samples, n+1, dtype=torch.long)
-    is_A_list = []
-
-    for i in range(num_samples):
-        # Randomly determine the size of group A
-        permuted_indices = torch.randperm(n)
-        size_A = int(random.gauss(25, 3))
-        is_A = torch.zeros(n, dtype=torch.bool)
-        is_A[permuted_indices[:size_A]] = True
-        is_A_list.append(is_A)
-
-        # Sample undirected adjacency matrix
-        Q = torch.zeros(n, n, dtype=torch.float)
-        for u in range(n):
-            for v in range(u + 1, n):
-                if is_A[u] and is_A[v]:
-                    p = x_a
-                elif not is_A[u] and not is_A[v]:
-                    p = y_b
-                else:
-                    p = p_inter
-                if torch.rand(()) < p:
-                    Q[u, v] = 1.0
-                    Q[v, u] = 1.0
-
-        Q_rows_tensor[i] = Q
-
-        # Build ordered target sequence
-        A_nodes = torch.nonzero(is_A, as_tuple=True)[0]
-        B_nodes = torch.nonzero(~is_A, as_tuple=True)[0]
-
-        seq = torch.full((n + 1,), EOS_index, dtype=torch.long)
-        seq[: len(A_nodes)] = A_nodes
-        seq[len(A_nodes)] = EOS_index
-        seq[len(A_nodes) + 1 :] = B_nodes
-
-        target_seq_tensor[i] = seq
-
-    return Q_rows_tensor, target_seq_tensor, is_A_list
-
-
-# Generate dataset and ground truth
-Q_rows_tensor, target_seq_tensor, is_A_list = generate_sbm_dataset(
-    # num_samples=500,
-    num_samples=5,
-    n=50,
-    x_a=0.8,
-    p_inter=0.2,
-    y_b=0.75
-)
-
-# Write dataset
-dataset_filename = 'experiments/max_cut/dataset.txt'
-write_dataset(dataset_filename, Q_rows_tensor, target_seq_tensor)
-
-# Write ground truth
-ground_truth_filename = 'experiments/max_cut/ground_truth.txt'
-write_ground_truth(ground_truth_filename, Q_rows_tensor, is_A_list)
+# Example usage
+builder = MaxCutDatasetBuilder(n=50)  # Dynamically uses n=50
+builder.build_dataset(num_samples=3)
+print(builder.targets[0])  # e.g. tensor([ 1,  3, 15, 20,  0,  0,  0, … ])
+builder.write_dataset('experiments/max_cut/train.txt')
