@@ -1,100 +1,49 @@
+import numpy as np
 import random
-import torch
-import pathlib
-from typing import Tuple
 
+# Parameters for dataset generation
+n = 10            # number of nodes in each graph
+num_samples = 10**2 # number of training samples to generate
+output_file = "maxcut_dataset.csv"
 
-class MaxCutDatasetBuilder:
-    """Generate pointer-network training files exactly like Gu & Yang (2020)."""
+def generate_maxcut_instance(n: int):
+    """Generate one random Max-Cut instance with known optimal solution.
+    Returns: (adjacency_matrix, solution_vector)
+        adjacency_matrix: n x n symmetric matrix of edge weights.
+        solution_vector: length-n binary array (0/1) indicating the partition of each node.
+    """
+    # Random binary assignment for n nodes (ensure not all 0 or all 1)
+    while True:
+        solution = [random.randint(0, 1) for _ in range(n)]
+        if any(v == 0 for v in solution) and any(v == 1 for v in solution):
+            break
+    solution = np.array(solution, dtype=int)
+    # Initialize adjacency matrix
+    W = np.zeros((n, n), dtype=float)
+    # Assign weights: positive for edges between partitions, negative for edges within a partition
+    for i in range(n):
+        for j in range(i+1, n):
+            if solution[i] != solution[j]:
+                # Edge between different partitions (cut edge) – assign a positive weight
+                w = random.uniform(0.1, 1.0)
+            else:
+                # Edge within the same partition – assign a negative weight
+                w = random.uniform(-1.0, -0.1)
+            W[i, j] = W[j, i] = w
+    # No self-loops; set diagonal to 0
+    np.fill_diagonal(W, 0.0)
+    return W, solution
 
-    def __init__(self, n: int, eos_index: int = 0):
-        self.n = n
-        self.eos_index = eos_index  # 0 ← EOS, 1..n ← vertices
-        assert eos_index == 0, "Article format requires EOS = 0 and 1-based vertices"
+# Generate multiple samples and save to CSV
+data_rows = []
+for _ in range(num_samples):
+    adj_matrix, solution = generate_maxcut_instance(n)
+    # Flatten the adjacency matrix and append the solution vector
+    flat_adj = adj_matrix.flatten()
+    row = np.concatenate([flat_adj, solution])
+    data_rows.append(row)
 
-    # --------------------------------------------------------------------- #
-    # 1.  Simple SBM graph sampler (unchanged)                              #
-    # --------------------------------------------------------------------- #
-    def _sample_sbm(self, x_a: float, p_inter: float, y_b: float,
-                    size_A_mu: float, size_A_sigma: float) -> Tuple[torch.Tensor, torch.BoolTensor]:
-        is_A = torch.zeros(self.n, dtype=torch.bool)
-        size_A = int(max(1, min(self.n - 1, random.gauss(size_A_mu, size_A_sigma))))
-        is_A[torch.randperm(self.n)[:size_A]] = True
-
-        Q = torch.zeros(self.n, self.n)
-        for u in range(self.n):
-            for v in range(u + 1, self.n):
-                p = x_a if (is_A[u] and is_A[v]) else y_b if (~is_A[u] and ~is_A[v]) else p_inter
-                if random.random() < p:
-                    Q[u, v] = Q[v, u] = 1.0
-        return Q, is_A
-
-    # --------------------------------------------------------------------- #
-    # 2.  Build a whole dataset                                             #
-    # --------------------------------------------------------------------- #
-    def build_dataset(self, num_samples: int,
-                      x_a: float = 0.8, p_inter: float = 0.2, y_b: float = 0.75,
-                      size_A_mu: float = 25, size_A_sigma: float = 3):
-        Qs, seqs, masks = [], [], []
-        for _ in range(num_samples):
-            Q, is_A = self._sample_sbm(x_a, p_inter, y_b, size_A_mu, size_A_sigma)
-            Qs.append(Q)
-            seqs.append(self._membership_to_sequence(is_A))
-            masks.append(is_A)
-        self.Q_rows = torch.stack(Qs)  # [B, n, n]
-        self.targets = torch.stack(seqs)  # [B, n+1]
-        self.masks = masks
-
-    # --------------------------------------------------------------------- #
-    # 3.  Write / read in article format                                    #
-    # --------------------------------------------------------------------- #
-    def write_dataset(self, path: str):
-        path = pathlib.Path(path)
-        path.parent.mkdir(parents=True, exist_ok=True)
-        with path.open('w') as f:
-            f.write(f"{len(self.Q_rows)} {self.n}\n")
-            for Q, seq in zip(self.Q_rows, self.targets):
-                for row in Q:
-                    f.write(' '.join(map(str, row.tolist())) + '\n')
-                f.write(' '.join(map(str, seq.tolist())) + '\n')
-
-    @staticmethod
-    def read_dataset(path: str):
-        with open(path) as f:
-            m, n = map(int, f.readline().split())
-            Q = torch.zeros(m, n, n)
-            tgt = torch.zeros(m, n + 1, dtype=torch.long)
-            for i in range(m):
-                for r in range(n):
-                    Q[i, r] = torch.tensor(list(map(float, f.readline().split())))
-                tgt[i] = torch.tensor(list(map(int, f.readline().split())))
-        return Q, tgt
-
-    def write_ground_truth_matrix(self, path: str):
-        path = pathlib.Path(path)
-        path.parent.mkdir(parents=True, exist_ok=True)
-        with path.open('w') as f:
-            f.write(f"{len(self.Q_rows)} {self.n}\n")
-            for mask in self.masks:
-                M = ((mask & mask[:, None]) | (~mask & ~mask[:, None])).float()
-                torch.diagonal(M).fill_(0.0)
-                for row in M:
-                    f.write(' '.join(map(str, row.tolist())) + '\n')
-
-    # --------------------------------------------------------------------- #
-    # 4.  Helper: build <A vertices> + EOS + padding                        #
-    # --------------------------------------------------------------------- #
-    def _membership_to_sequence(self, is_A: torch.BoolTensor) -> torch.LongTensor:
-        A = torch.nonzero(is_A, as_tuple=True)[0] + 1  # 1-based vertex IDs
-        seq = torch.full((self.n + 1,), self.eos_index, dtype=torch.long)
-        seq[:len(A)] = A  # vertices in set A
-        seq[len(A)] = self.eos_index  # single EOS
-        # rest remain EOS (0)
-        return seq
-
-
-# Example usage
-builder = MaxCutDatasetBuilder(n=50)  # Dynamically uses n=50
-builder.build_dataset(num_samples=3)
-print(builder.targets[0])  # e.g. tensor([ 1,  3, 15, 20,  0,  0,  0, … ])
-builder.write_dataset('experiments/max_cut/train.txt')
+data_array = np.array(data_rows)
+# Save as CSV: each row begins with n*n adjacency entries, followed by n solution entries
+np.savetxt(output_file, data_array, fmt="%.4f", delimiter=",")
+print(f"Dataset saved to {output_file} (format: {n*n} adjacency values + {n} solution values per line).")

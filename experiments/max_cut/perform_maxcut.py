@@ -1,54 +1,80 @@
+import math
+import numpy as np
 import torch
-from torch.utils.data import TensorDataset, DataLoader
 import torch.nn as nn
+from PointerNet import PointerNetwork
 
-from PointerNet import PointerNet, train_model
+# Load the dataset from CSV
+data = np.loadtxt("maxcut_dataset.csv", delimiter=",")
+num_samples, total_dim = data.shape
+# Deduce number of nodes n from total_dim = n*n + n  (solve n^2 + n - total_dim = 0)
+n = int((-1 + math.sqrt(1 + 4 * total_dim)) / 2)
+assert n * n + n == total_dim, "Invalid dataset format: cannot deduce n."
 
-# --------------------------------------------------------------------------- #
-# 1) Paths to your saved files                                                #
-# --------------------------------------------------------------------------- #
-dataset_path       = "experiments/max_cut/dataset.txt"        # ← same file your write_dataset produced
-ground_truth_path  = "experiments/max_cut/ground_truth.txt"   # (optional) only needed for evaluation
+# Split data into adjacency and solution
+X = data[:, :n*n].reshape(num_samples, n, n).astype(np.float32)
+Y = data[:, n*n:].astype(int)
 
-# --------------------------------------------------------------------------- #
-# 2) Load the dataset you previously wrote                                   #
-# --------------------------------------------------------------------------- #
-from create_graphs import read_dataset          # or the module where read_dataset lives
+# Prepare target sequences for training (list of node index sequences including EOS)
+target_sequences = []
+eos_index = n  # use index n as the EOS token
+for sol in Y:
+    # Nodes with value 1 go in one partition, value 0 in the other
+    set1_indices = [i for i, val in enumerate(sol) if val == 1]
+    set0_indices = [i for i, val in enumerate(sol) if val == 0]
+    set1_indices.sort()
+    set0_indices.sort()
+    # Output sequence: all nodes in set1, then EOS, then all nodes in set0
+    seq = set1_indices + [eos_index] + set0_indices
+    target_sequences.append(seq)
 
-Q_rows_tensor, target_seq_tensor = read_dataset(dataset_path)   # shapes: [S,n,n], [S,n+1]
-num_samples, n, _ = Q_rows_tensor.shape
+# Convert data to PyTorch tensors
+X_tensor = torch.tensor(X)            # shape: (num_samples, n, n)
+# (We'll feed target_sequences directly as Python lists to the model's forward in this example)
 
+# Initialize the Pointer Network model
+model = PointerNetwork(input_dim=n, embedding_dim=128, hidden_dim=256)
+optimizer = torch.optim.SGD(model.parameters(), lr=0.1)
+# (Optionally, use GPU if available)
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+model.to(device)
+X_tensor = X_tensor.to(device)
 
+# Training loop
+model.train()
+batch_size = 16
+num_epochs = 30
+for epoch in range(1, num_epochs+1):
+    # Shuffle the training data indices for each epoch
+    indices = np.random.permutation(num_samples)
+    epoch_loss = 0.0
+    for i in range(0, num_samples, batch_size):
+        batch_idx = indices[i:i+batch_size]
+        batch_X = X_tensor[batch_idx]               # (batch_size, n, n)
+        batch_targets = [target_sequences[j] for j in batch_idx]  # list of sequences
+        optimizer.zero_grad()
+        loss = model(batch_X, target_seq=batch_targets)  # compute cross-entropy loss
+        loss.backward()
+        optimizer.step()
+        epoch_loss += loss.item() * len(batch_idx)
+    avg_loss = epoch_loss / num_samples
+    if epoch % 10 == 0 or epoch == 1:
+        print(f"Epoch {epoch}/{num_epochs}, Average Loss: {avg_loss:.4f}")
 
-# --------------------------------------------------------------------------- #
-# 3) Build DataLoader                                                         #
-# --------------------------------------------------------------------------- #
-batch_size = 32
-dataset     = TensorDataset(Q_rows_tensor, target_seq_tensor)
-train_loader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
-
-# --------------------------------------------------------------------------- #
-# 4) Instantiate model and train                                              #
-# --------------------------------------------------------------------------- #
-model = PointerNet(input_dim=n, hidden_dim=256)
-
-train_model(
-    model,
-    train_loader,
-    n,                  # so logits.view knows the vocabulary size
-    max_epochs=1_000
-)
-
-# --------------------------------------------------------------------------- #
-# 5) (Optional) If you want ground-truth adjacencies for evaluation           #
-# --------------------------------------------------------------------------- #
-# from max_cut_dataset import read_dataset   # reader already imported
-# _, gt_target_seq = read_dataset(dataset_path)           # pointer seqs already in memory
-# with open(ground_truth_path, "r") as f:                  # quick sanity-load of GT adjacencies
-#     f.readline()  # skip header
-#     ground_truth_adj = []
-#     for s in range(num_samples):
-#         ground_truth_adj.append(
-#             torch.tensor([list(map(float, f.readline().split())) for _ in range(n)])
-#         )
-# ground_truth_adj = torch.stack(ground_truth_adj)        # [S,n,n]
+# Example: use the trained model to predict the Max-Cut for a new graph (or a training sample)
+model.eval()
+with torch.no_grad():
+    sample_index = 0  # using the first training sample as an example
+    sample_adj = X_tensor[sample_index:sample_index+1]  # shape: (1, n, n)
+    output_seq = model(sample_adj)[0]  # predicted sequence of indices (including eos index)
+    # Interpret the output sequence: split into two sets at the EOS position
+    if eos_index in output_seq:
+        eos_pos = output_seq.index(eos_index)
+    else:
+        eos_pos = len(output_seq)
+    pred_set1 = output_seq[:eos_pos]
+    pred_set0 = output_seq[eos_pos+1:]
+    pred_solution = [1 if i in pred_set1 else 0 for i in range(n)]
+    print("\nExample prediction for sample index 0:")
+    print("Predicted partition vector:", pred_solution)
+    print("True partition vector:     ", Y[sample_index].tolist())
