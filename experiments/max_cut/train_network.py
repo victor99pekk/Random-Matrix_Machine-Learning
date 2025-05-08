@@ -11,6 +11,7 @@ hidden_dim    = 256
 batch_size    = 16
 num_epochs    = 5 * 10**2
 lr            = 0.1
+path = "experiments/max_cut/saved_models/"
 
 def load_dataset(filename):
     # Each row has n*n adjacency entries (0/1) + n solution entries (0/1)
@@ -51,10 +52,14 @@ model = PointerNetwork(input_dim=n,
                        hidden_dim=hidden_dim).to(device)
 optimizer = torch.optim.SGD(model.parameters(), lr=lr)
 
+load_state = torch.load(path + f"ptr_net_weights_n={n}.pth", map_location="cpu")
+model.load_state_dict(load_state)
+
 # ── Training Loop ────────────────────────────────────────────────────────────────
-model.train()
+# model.train()
 N_train = X_train_t.size(0)
 for epoch in range(1, num_epochs+1):
+    model.train()
     perm = torch.randperm(N_train, device=device)
     epoch_loss = 0.0
     for i in range(0, N_train, batch_size):
@@ -86,8 +91,7 @@ for epoch in range(1, num_epochs+1):
                 pred = [1 if idx in chosen else 0 for idx in range(n)]
                 if pred == Y_test[i+j].tolist():
                     correct += 1
-            # print("model output: ", )
         accuracy = correct / N_test * 100
         print(f"\nTest Accuracy: {correct}/{N_test} = {accuracy:.2f}%")
-        torch.save(model.state_dict(), "experiments/max_cut/saved_models/ptr_net_weights.pth")
+        torch.save(model.state_dict(), f"experiments/max_cut/saved_models/ptr_net_weights_n={n}.pth")
         # print("Saved model in file ptr_net_weights.pth")
