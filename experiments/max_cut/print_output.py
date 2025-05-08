@@ -81,14 +81,14 @@ with torch.no_grad():
             if pred == target:
                 correct += 1
 
-            # Collect random samples for printing
+            # Collect random samples for printing (store sample index)
             if len(random_samples) < 3 and random.random() < 0.1:  # 10% chance to pick a sample
-                random_samples.append((pred, target))
+                random_samples.append((i + j, pred, target))  # Store sample index, prediction, and target
 
     # Print 3 random outputs compared to targets
     print("\nRandom Model Outputs Compared to Targets:")
-    for idx, (pred, target) in enumerate(random_samples[:3]):
-        print(f"Sample {idx + 1}:")
+    for idx, (sample_idx, pred, target) in enumerate(random_samples[:3]):
+        print(f"Sample {idx + 1} (Dataset Index: {sample_idx}):")
         print(f"  Model Output: {pred}")
         print(f"  Target:       {target}")
         print(f"  Match:        {'Yes' if pred == target else 'No'}")

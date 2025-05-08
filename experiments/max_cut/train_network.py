@@ -10,7 +10,7 @@ embedding_dim = 128
 hidden_dim    = 256
 batch_size    = 16
 num_epochs    = 5 * 10**2
-lr            = 0.1
+lr            = 0.01
 path = "experiments/max_cut/saved_models/"
 
 def load_dataset(filename):
@@ -52,8 +52,8 @@ model = PointerNetwork(input_dim=n,
                        hidden_dim=hidden_dim).to(device)
 optimizer = torch.optim.SGD(model.parameters(), lr=lr)
 
-load_state = torch.load(path + f"ptr_net_weights_n={n}.pth", map_location="cpu")
-model.load_state_dict(load_state)
+# load_state = torch.load(path + f"ptr_net_weights_n={n}.pth", map_location="cpu")
+# model.load_state_dict(load_state)
 
 # ── Training Loop ────────────────────────────────────────────────────────────────
 # model.train()
@@ -84,14 +84,18 @@ for epoch in range(1, num_epochs+1):
             batch_X = X_test_t[i:i+batch_size]
             outputs = model(batch_X)  # List of length ≤ batch_size of index‐sequences
             for j, out_seq in enumerate(outputs):
-                # Find EOS
                 eos_pos = out_seq.index(n) if n in out_seq else len(out_seq)
-                chosen = set(out_seq[:eos_pos])
-                # Reconstruct predicted binary vector
-                pred = [1 if idx in chosen else 0 for idx in range(n)]
-                if pred == Y_test[i+j].tolist():
+                chosen  = set(out_seq[:eos_pos])              # nodes in partition 1
+                pred    = np.zeros(n, dtype=int)
+                pred[list(chosen)] = 1                        # shape (n,)
+
+                # --- ground truth ------------------------------------------------------
+                target = Y_test[i + j]                        # numpy array, shape (n,)
+
+                # --- accept either orientation ----------------------------------------
+                if np.array_equal(pred, target) or np.array_equal(1 - pred, target):
                     correct += 1
-        accuracy = correct / N_test * 100
+                accuracy = correct / N_test * 100
         print(f"\nTest Accuracy: {correct}/{N_test} = {accuracy:.2f}%")
         torch.save(model.state_dict(), f"experiments/max_cut/saved_models/ptr_net_weights_n={n}.pth")
         # print("Saved model in file ptr_net_weights.pth")
