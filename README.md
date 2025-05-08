@@ -3,8 +3,8 @@ This is the repository for an ongoing reserach study in the application of rando
 
 
 ## Current stage:
-- Read chapter 4
-- Experiment with max cut
+- Reading chapter 4 of High dimensional probability (in papers-folder)
+- Experimenting / programming with the max cut problem
 
 
 ## Contents:
