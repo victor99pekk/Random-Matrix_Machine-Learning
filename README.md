@@ -1,4 +1,6 @@
 # study of RMT in ML
+This is the repository for an ongoing reserach study in the application of random matrix theory in machine learning conducted by Victor Pekkari and Armon Haghighi at University of California, San Diego.
+
 
 ## Current stage:
 - Read chapter 4
