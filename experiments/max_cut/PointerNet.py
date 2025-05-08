@@ -18,17 +18,15 @@ class PointerNetwork(nn.Module):
         self.input_dim = input_dim
         self.embedding_dim = embedding_dim
         self.hidden_dim = hidden_dim
-        # Linear embedding layer to project each node's features (adjacency row) to embedding_dim
-        self.input_embed = nn.Linear(input_dim, embedding_dim)
-        # LSTM encoder processes the sequence of node embeddings
+        self.input_embed = nn.Linear(input_dim, embedding_dim) # embedding for each row
+         # for encoder to process the rows as a sequence
         self.encoder_lstm = nn.LSTM(embedding_dim, hidden_dim, batch_first=True)
         # LSTM decoder generates the output sequence of node indices
         self.decoder_lstm = nn.LSTM(embedding_dim, hidden_dim, batch_first=True)
-        # Learnable embedding for the start of decoding 
+        # embedding for start vector of the decoder
         self.decoder_start = nn.Parameter(torch.FloatTensor(embedding_dim))
-        # Learnable vector representing the "end-of-sequence" (EOS) in the attention mechanism
+        # Learnable EOS token
         self.enc_eos = nn.Parameter(torch.FloatTensor(hidden_dim))
-        # Initialize the learnable parameters
         nn.init.uniform_(self.decoder_start, -0.1, 0.1)
         nn.init.uniform_(self.enc_eos, -0.1, 0.1)
 
