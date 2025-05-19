@@ -17,7 +17,8 @@ Link: `https://biqmac.aau.at/biqmaclib.html`
 ---
 
 
-__`Graph spec:`__ Each graph used in these experiments is generated with a planted partition for the Max-Cut problem:
+## Graph spec
+Each graph used in these experiments is generated with a planted partition for the Max-Cut problem:
 
 - Each graph contains `n` nodes, split exactly in half: `n/2` nodes are assigned to group 1 and `n/2` nodes to group 0.
 - For each graph, three probabilities are sampled independently: `P1` and `P0` are drawn uniformly from `[0.9, 1.0]` and represent the probability of connecting two nodes within group 1 or group 0, respectively. `P` is drawn uniformly from `[0, 0.1]` and is the probability of connecting nodes across the two groups.
