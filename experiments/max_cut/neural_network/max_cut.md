@@ -7,6 +7,14 @@ In this experiment we compare the performance of a `heuristic maximum cut` algor
 1. function to create an adjacency graph between n number of nodes in a graph. connecting the nodes from the different groups with the correct probability
 2. heuristic maximum cut algrithm
 3. deep learning algorithm, several graphs for training
+---
+
+
+__Potential Benchmark:__ The Biq Mac Library contains a diverse collection of benchmark instances for the Max-Cut problem, and depending on the subdirectory or generator, the probability that two nodes are connected depends on the instance type and its associated edge density parameter.
+
+Link: `https://biqmac.aau.at/biqmaclib.html`
+
+---
 
 
 __`Graph spec:`__ the graphs we use in this experiments contain nodes, where every node contain one of two groups, A or B. Two nodes from the same group are connected with probability 0.9, and nodes that arent in the same group are connected with probability 0.1. the file adj_matrices.txt contain 10 different adjacency matrices for 10 different graphs.

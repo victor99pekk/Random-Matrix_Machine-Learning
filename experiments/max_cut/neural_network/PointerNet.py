@@ -51,12 +51,12 @@ class PointerNetwork(nn.Module):
         dec_hidden, dec_cell = enc_hidden, enc_cell
         # Prepare the initial decoder input (start token embedding, same for all batch elements)
         dec_input = self.decoder_start.unsqueeze(0).expand(batch_size, -1)  # shape: (batch_size, embedding_dim)
-        # Mask to keep track of which indices have been selected (to avoid repetitions); size n+1 to include EOS
+        # Mask to keep track of which indices have been selected. size n+1 to include EOS
         selected_mask = torch.zeros(batch_size, n+1, dtype=torch.bool, device=adj_matrix.device)
 
         if target_seq is not None:
+            # print(target_seq)
             # **Training mode**: compute cross-entropy loss with teacher forcing
-            # Ensure target_seq is a tensor of shape (batch_size, seq_length)
             if not isinstance(target_seq, torch.Tensor):
                 # Convert list of sequences to a padded tensor (pad with -100 for ignore_index)
                 max_len = max(len(seq) for seq in target_seq)
@@ -68,8 +68,7 @@ class PointerNetwork(nn.Module):
                 target_seq = target_seq.long()
             seq_len = target_seq.size(1)
             loss = 0.0
-            for t in range(seq_len):
-                # Run one step of decoder LSTM
+            for t in range(seq_len): #run iterations of steps of LSTM
                 _, (dec_hidden, dec_cell) = self.decoder_lstm(dec_input.unsqueeze(1), (dec_hidden, dec_cell))
                 # Compute attention (pointer) logits over n nodes + EOS
                 # Extend encoder outputs with EOS vector for attention scoring

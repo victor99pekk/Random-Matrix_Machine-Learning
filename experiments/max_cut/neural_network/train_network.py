@@ -4,14 +4,14 @@ import torch
 import torch.nn.functional as F
 from PointerNet import PointerNetwork
 
-train_file    = "experiments/max_cut/data/maxcut_train.csv"
-test_file     = "experiments/max_cut/data/maxcut_test.csv"
+train_file    = "experiments/max_cut/data/maxcut_train_10.csv"
+test_file     = "experiments/max_cut/data/maxcut_test_10.csv"
 embedding_dim = 128
 hidden_dim    = 256
 batch_size    = 16
 num_epochs    = 5 * 10**2
 lr            = 0.01
-path = "experiments/max_cut/saved_models/"
+path = "experiments/max_cut/neural_network/saved_models/"
 
 def load_dataset(filename):
     # Each row has n*n adjacency entries (0/1) + n solution entries (0/1)
@@ -97,5 +97,5 @@ for epoch in range(1, num_epochs+1):
                     correct += 1
                 accuracy = correct / N_test * 100
         print(f"\nTest Accuracy: {correct}/{N_test} = {accuracy:.2f}%")
-        torch.save(model.state_dict(), f"experiments/max_cut/saved_models/ptr_net_weights_n={n}.pth")
+        torch.save(model.state_dict(), f"experiments/max_cut/neural_network/saved_models/n={n}.pth")
         # print("Saved model in file ptr_net_weights.pth")

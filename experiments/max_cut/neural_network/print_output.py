@@ -4,14 +4,16 @@ import torch
 import torch.nn.functional as F
 from PointerNet import PointerNetwork
 
-train_file    = "experiments/max_cut/data/maxcut_train.csv"
-test_file     = "experiments/max_cut/data/maxcut_test.csv"
+train_file    = "experiments/max_cut/data/maxcut_train_50.csv"
+test_file     = "experiments/max_cut/data/maxcut_test_50.csv"
 embedding_dim = 128
 hidden_dim    = 256
 batch_size    = 16
 num_epochs    = 5 * 10**2
 lr            = 0.1
-path = "experiments/max_cut/saved_models"
+path = "experiments/max_cut/neural_network/saved_models"
+
+model_name = "ptr_net_weights_n=50_95%"
 
 def load_dataset(filename):
     # Each row has n*n adjacency entries (0/1) + n solution entries (0/1)
@@ -51,7 +53,7 @@ model = PointerNetwork(input_dim=n,
                        embedding_dim=embedding_dim,
                        hidden_dim=hidden_dim).to(device)
 
-state_dict = torch.load(path + "/" + "ptr_net_weights.pth", map_location="cpu")
+state_dict = torch.load(path + "/" + f"{model_name}.pth", map_location="cpu")
 model.load_state_dict(state_dict)
 optimizer = torch.optim.SGD(model.parameters(), lr=lr)
 
@@ -78,7 +80,7 @@ with torch.no_grad():
             target = Y_test[i+j].tolist()
 
             # Compare prediction with target
-            if pred == target:
+            if np.array_equal(pred, target) or np.array_equal(1 - np.array(pred), target):
                 correct += 1
 
             # Collect random samples for printing (store sample index)
@@ -96,5 +98,5 @@ with torch.no_grad():
     # Calculate and print accuracy
     accuracy = correct / N_test * 100
     print(f"\nTest Accuracy: {correct}/{N_test} = {accuracy:.2f}%")
-    torch.save(model.state_dict(), f"experiments/max_cut/saved_models/ptr_net_weights_n={n}.pth")
+    torch.save(model.state_dict(), f"experiments/max_cut/neural_network/saved_models/ptr_net_weights_n={n}.pth")
     # print("Saved model in file ptr_net_weights.pth")
