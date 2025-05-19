@@ -44,3 +44,5 @@ We didnt try with a network bigger that a 100 nodes. And we only trained the net
 
 ## Continuation
 I believe if we trained on a GPU for enough time that we could achieve near `100%` on the graph with 100 nodes, and possibly even larger.
+
+An interesting thing to do could be to test it on the `big mac` data to compare it to the paper about maxcut in the `papers/maxcut` folder
