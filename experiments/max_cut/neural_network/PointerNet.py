@@ -46,26 +46,25 @@ class PointerNetwork(nn.Module):
         n = adj_matrix.size(1)  # number of nodes
         # 1. **Encoder**: Embed each node's adjacency row and run through LSTM encoder
         node_embeds = self.input_embed(adj_matrix)              # shape: (batch_size, n, embedding_dim)
-        encoder_outputs, (enc_hidden, enc_cell) = self.encoder_lstm(node_embeds)  # encoder_outputs: (batch, n, hidden_dim)
-        # Initialize decoder hidden state and cell state with encoder's final state
+        encoder_outputs, (enc_hidden, enc_cell) = self.encoder_lstm(node_embeds)  
         dec_hidden, dec_cell = enc_hidden, enc_cell
         # Prepare the initial decoder input (start token embedding, same for all batch elements)
         dec_input = self.decoder_start.unsqueeze(0).expand(batch_size, -1)  # shape: (batch_size, embedding_dim)
-        # Mask to keep track of which indices have been selected. size n+1 to include EOS
         selected_mask = torch.zeros(batch_size, n+1, dtype=torch.bool, device=adj_matrix.device)
 
         if target_seq is not None:
             # print(target_seq)
-            # **Training mode**: compute cross-entropy loss with teacher forcing
-            if not isinstance(target_seq, torch.Tensor):
-                # Convert list of sequences to a padded tensor (pad with -100 for ignore_index)
-                max_len = max(len(seq) for seq in target_seq)
-                target_tensor = torch.full((batch_size, max_len), -100, dtype=torch.long)
-                for i, seq in enumerate(target_seq):
-                    target_tensor[i, :len(seq)] = torch.tensor(seq, dtype=torch.long)
-                target_seq = target_tensor
-            else:
-                target_seq = target_seq.long()
+            # **Training mode**
+            # if not isinstance(target_seq, torch.Tensor):
+            #     # Convert list of sequences to a padded tensor (pad with -100 for ignore_index)
+            #     max_len = max(len(seq) for seq in target_seq)
+            #     target_tensor = torch.full((batch_size, max_len), -100, dtype=torch.long)
+            #     for i, seq in enumerate(target_seq):
+            #         target_tensor[i, :len(seq)] = torch.tensor(seq, dtype=torch.long)
+            #     target_seq = target_tensor
+            # else:
+            #     target_seq = target_seq.long()
+            target_seq = target_seq.long()
             seq_len = target_seq.size(1)
             loss = 0.0
             for t in range(seq_len): #run iterations of steps of LSTM
