@@ -17,6 +17,22 @@ Link: `https://biqmac.aau.at/biqmaclib.html`
 ---
 
 
-__`Graph spec:`__ the graphs we use in this experiments contain nodes, where every node contain one of two groups, A or B. Two nodes from the same group are connected with probability 0.9, and nodes that arent in the same group are connected with probability 0.1. the file adj_matrices.txt contain 10 different adjacency matrices for 10 different graphs.
+__`Graph spec:`__ Each graph used in these experiments is generated with a planted partition for the Max-Cut problem:
 
-`Creation of graphs:` the function `create_graphs()` creates a .txt file with 10 different 20x20 adjacency matrices, graphs with 20 nodes in them. each entry is either 1 or 0 depending if the nodes are connected or not.
+- Each graph contains `n` nodes, split exactly in half: `n/2` nodes are assigned to group 1 and `n/2` nodes to group 0.
+- For each graph, three probabilities are sampled independently: `P1` and `P0` are drawn uniformly from `[0.9, 1.0]` and represent the probability of connecting two nodes within group 1 or group 0, respectively. `P` is drawn uniformly from `[0, 0.1]` and is the probability of connecting nodes across the two groups.
+- For every pair of nodes `i < j`:
+    - If both nodes are in group 1, they are connected with probability `P1`.
+    - If both nodes are in group 0, they are connected with probability `P0`.
+    - If the nodes are in different groups, they are connected with probability `P`.
+- The result is an `n x n` adjacency matrix of 0/1 edges, and a length-`n` vector indicating the planted partition (the ground truth group assignment for each node).
+
+
+---
+
+
+
+## Results:
+The best-performing network achieves just over `80%` accuracy in partitioning all nodes correctly on graphs with `100 nodes`. This means that, for these graphs, the model correctly classifies every node into its respective group more than 80% of the time. This network is saved in `"saved_models/n=100_82%.pth"`
+
+We didnt try with a network bigger that a 100 nodes.
