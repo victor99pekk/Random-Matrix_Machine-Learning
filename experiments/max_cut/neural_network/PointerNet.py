@@ -103,7 +103,6 @@ class PointerNetwork(nn.Module):
                         # Use the original embedding of the selected node as next decoder input
                         next_inputs.append(node_embeds[i, idx])
                 dec_input = torch.stack(next_inputs, dim=0)  # shape: (batch_size, embedding_dim)
-            # Average loss per sequence element
             avg_loss = loss / (batch_size * seq_len)
             return avg_loss
 
