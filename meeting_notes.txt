@@ -68,3 +68,8 @@ MEETING 5:
 - start looking at chapter 4
 - code some experiments regarding maximum cut
 
+
+
+-------------------------------------------------------
+
+

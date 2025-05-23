@@ -1,4 +1,4 @@
 
-experiments/max_cut/data/*
-experiments/max_cut/neural_network/saved_models/*
+max_cut/data/*
+max_cut/neural_network/saved_models/*
 *.csv

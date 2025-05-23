@@ -2,14 +2,10 @@
 This is the repository for an ongoing reserach study in the application of random matrix theory in machine learning conducted by `Victor Pekkari` and `Armon Haghighi` at University of California, San Diego.
 
 
-## Current stage:
-- Reading chapter 4 of High dimensional probability (in papers-folder)
-- Experimenting / programming with the max cut problem
-
-
 ## Contents:
 __`papers`-folder:__ contains all the literature that we have studied in this project
 
-__`project_proposal`-folder:__ has the inital proposal on what applications of random matrix theory in machine learning to research, and also a outline for a schedule
+__`max_cut`-folder:__ This folder contains the initial experiment work for our independent study, focusing on the Max-Cut problem using neural networks and heurisitc methods like Semidefinite Programming. The project was later continued and expanded in this repo: [Max Cut](https://github.com/victor99pekk/Max_Cut)
 
-__`experiments`-folder:__ contains all experiments we have coded including folders for each experiment, there is for example one folder belonging to the max_cut experiments we have done
+__`project_proposal`-folder:__ has the inital proposal on what applications of random matrix theory in machine learning to research, and also a outline for a schedule.
+

@@ -55,15 +55,15 @@ class PointerNetwork(nn.Module):
         if target_seq is not None:
             # print(target_seq)
             # **Training mode**
-            # if not isinstance(target_seq, torch.Tensor):
-            #     # Convert list of sequences to a padded tensor (pad with -100 for ignore_index)
-            #     max_len = max(len(seq) for seq in target_seq)
-            #     target_tensor = torch.full((batch_size, max_len), -100, dtype=torch.long)
-            #     for i, seq in enumerate(target_seq):
-            #         target_tensor[i, :len(seq)] = torch.tensor(seq, dtype=torch.long)
-            #     target_seq = target_tensor
-            # else:
-            #     target_seq = target_seq.long()
+            if not isinstance(target_seq, torch.Tensor):
+                # Convert list of sequences to a padded tensor (pad with -100 for ignore_index)
+                max_len = max(len(seq) for seq in target_seq)
+                target_tensor = torch.full((batch_size, max_len), -100, dtype=torch.long)
+                for i, seq in enumerate(target_seq):
+                    target_tensor[i, :len(seq)] = torch.tensor(seq, dtype=torch.long)
+                target_seq = target_tensor
+            else:
+                target_seq = target_seq.long()
             target_seq = target_seq.long()
             seq_len = target_seq.size(1)
             loss = 0.0
